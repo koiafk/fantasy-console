@@ -4,7 +4,7 @@ A fantasy console built from scratch in **one HTML file** with no libraries and 
 
 Open `index.html` in any modern browser. That's the whole install.
 
-<!-- Add a screenshot here: ![screenshot](screenshot.png) -->
+**[Launch the Emulator](https://koiafk.github.io/fantasy-console/)**
 
 ## What's in it
 
