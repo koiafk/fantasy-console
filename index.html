@@ -1,0 +1,1573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>koiafk OS v1.0 - [Fantasy Console 16-Bit]</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+body { background-color: #008080; font-family: "Tahoma", "MS Sans Serif", "Segoe UI", sans-serif; font-size: 11px; color: #000000; width: 100vw; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 4px; position: relative; }
+
+/* Desktop Icons */
+.desktop-icon {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  text-decoration: none;
+  color: white;
+  text-shadow: 1px 1px 2px black, -1px -1px 2px black, 1px -1px 2px black, -1px 1px 2px black;
+  font-size: 11px;
+  font-family: "Tahoma", "MS Sans Serif", sans-serif;
+  z-index: 10;
+  width: 80px;
+  text-align: center;
+}
+.desktop-icon svg { width: 48px; height: 48px; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5)); margin-bottom: 2px; }
+.desktop-icon-text { padding: 1px 4px; }
+.desktop-icon:hover .desktop-icon-text { background: #000080; outline: 1px dotted #ffffff; color: white; }
+
+#icon-github { top: 20px; left: 20px; }
+#icon-docs { top: 100px; left: 20px; }
+
+/* Classic Windows 98 scrollbars */
+::-webkit-scrollbar { width: 14px; height: 14px; }
+::-webkit-scrollbar-track { background: #dfdfdf; }
+::-webkit-scrollbar-thumb { background: #c0c0c0; border-top: 1px solid #ffffff; border-left: 1px solid #ffffff; border-right: 1px solid #000000; border-bottom: 1px solid #000000; box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080; }
+::-webkit-scrollbar-button { background: #c0c0c0; border-top: 1px solid #ffffff; border-left: 1px solid #ffffff; border-right: 1px solid #000000; border-bottom: 1px solid #000000; width: 14px; height: 14px; }
+
+/* Main Window */
+.win-window { background: #c0c0c0; border-top: 2px solid #ffffff; border-left: 2px solid #ffffff; border-right: 2px solid #000000; border-bottom: 2px solid #000000; box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080; display: flex; flex-direction: column; width: 100%; height: 100%; max-width: 1200px; max-height: 860px; overflow: hidden; position: relative; min-height: 0; min-width: 0; margin-left: 90px; }
+.win-titlebar { background: #000080; color: #ffffff; padding: 3px 4px 3px 6px; display: flex; align-items: center; justify-content: space-between; font-weight: bold; font-size: 11px; height: 22px; flex-shrink: 0; }
+.win-titlebar-buttons { display: flex; gap: 2px; }
+.win-titlebar-btn { width: 16px; height: 14px; background: #c0c0c0; border-top: 1px solid #ffffff; border-left: 1px solid #ffffff; border-right: 1px solid #000000; border-bottom: 1px solid #000000; font-size: 9px; font-weight: bold; line-height: 12px; text-align: center; color: #000000; cursor: default; display: flex; align-items: center; justify-content: center; }
+.win-titlebar-btn:active { border-top: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #ffffff; border-bottom: 1px solid #ffffff; padding-top: 1px; padding-left: 1px; }
+
+.win-menubar { display: flex; gap: 2px; padding: 2px 4px; border-bottom: 1px solid #808080; background: #c0c0c0; flex-shrink: 0; position: relative; }
+.win-menu-item { padding: 2px 6px; cursor: default; position: relative; }
+.win-menu-item:hover, .win-menu-item.open { background: #000080; color: #ffffff; }
+.win-menu-item u { text-decoration: underline; }
+.win-dropdown { position: absolute; top: 100%; left: 0; background: #c0c0c0; border-top: 2px solid #ffffff; border-left: 2px solid #ffffff; border-right: 2px solid #000000; border-bottom: 2px solid #000000; box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080, 2px 2px 4px rgba(0,0,0,0.4); display: none; flex-direction: column; min-width: 140px; z-index: 100; }
+.win-dropdown-item { padding: 4px 12px; color: #000000; cursor: default; display: flex; align-items: center; justify-content: space-between; }
+.win-dropdown-item:hover { background: #000080; color: #ffffff; }
+.win-dropdown-sub { position: relative; }
+.win-dropdown-sub:hover .win-sub-menu { display: flex; }
+.win-sub-menu { position: absolute; top: 0; left: 100%; background: #c0c0c0; border-top: 2px solid #ffffff; border-left: 2px solid #ffffff; border-right: 2px solid #000000; border-bottom: 2px solid #000000; box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080, 2px 2px 4px rgba(0,0,0,0.4); display: none; flex-direction: column; min-width: 130px; }
+
+.win-toolbar { padding: 4px 6px; display: flex; gap: 6px; border-bottom: 1px solid #808080; background: #c0c0c0; flex-shrink: 0; }
+button.win-btn { background: #c0c0c0; border-top: 2px solid #ffffff; border-left: 2px solid #ffffff; border-right: 2px solid #000000; border-bottom: 2px solid #000000; box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080; padding: 3px 12px; font-family: inherit; font-size: 11px; color: #000000; cursor: default; outline: none; }
+button.win-btn:active { border-top: 2px solid #000000; border-left: 2px solid #000000; border-right: 2px solid #ffffff; border-bottom: 2px solid #ffffff; box-shadow: none; padding: 4px 11px 2px 13px; }
+button.win-btn:focus { outline: 1px dotted #000000; outline-offset: -4px; }
+
+.win-main-body { flex: 1; display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 4fr) minmax(0, 3fr); grid-template-rows: minmax(0, 1fr) 105px; gap: 6px; padding: 6px; min-height: 0; min-width: 0; overflow: hidden; }
+.win-panel { border-top: 2px solid #808080; border-left: 2px solid #808080; border-right: 2px solid #ffffff; border-bottom: 2px solid #ffffff; background: #c0c0c0; padding: 6px; display: flex; flex-direction: column; position: relative; min-height: 0; min-width: 0; overflow: hidden; }
+.win-panel-header { font-size: 11px; font-weight: bold; padding: 2px 4px; line-height: 18px; height: 22px; flex-shrink: 0; background: #c0c0c0; border-bottom: 1px solid #808080; margin-bottom: 4px; }
+
+.editor-frame { flex: 1; background: #ffffff; border-top: 2px solid #000000; border-left: 2px solid #000000; border-right: 2px solid #ffffff; border-bottom: 2px solid #ffffff; box-shadow: inset 1px 1px 0 #808080; display: flex; position: relative; min-height: 0; overflow: hidden; }
+.gutter { width: 32px; background: #e0e0e0; border-right: 1px solid #808080; overflow-y: hidden; padding: 4px 0; display: flex; flex-direction: column; }
+.gutter-row { height: 18px; display: flex; align-items: center; justify-content: flex-end; padding-right: 4px; font-family: "Courier New", monospace; font-size: 11px; color: #555555; cursor: pointer; gap: 3px; }
+.gutter-bp { width: 6px; height: 6px; border-radius: 50%; background: transparent; }
+.gutter-bp.active { background: #ff0000; border: 1px solid #800000; }
+.editor-wrapper { flex: 1; position: relative; min-height: 0; overflow: hidden; }
+#line-marker { position: absolute; left: 0; right: 0; height: 18px; background: #ffffcc; border-top: 1px solid #cccc00; border-bottom: 1px solid #cccc00; pointer-events: none; z-index: 1; display: none; }
+textarea#code-input { width: 100%; height: 100%; border: none; background: transparent; color: #000000; font-family: "Courier New", monospace; font-size: 11px; line-height: 18px; padding: 4px 6px; resize: none; outline: none; white-space: pre; tab-size: 4; overflow: auto; position: relative; z-index: 2; user-select: text; }
+.err-box { background: #ffcccc; border: 1px solid #ff0000; color: #990000; padding: 2px 4px; font-size: 10px; display: none; margin-top: 4px; flex-shrink: 0; }
+
+.mid-column { display: flex; flex-direction: column; gap: 4px; min-height: 0; overflow: hidden; }
+.reg-table { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; flex-shrink: 0; }
+.field-row { display: flex; align-items: center; justify-content: space-between; }
+.win-input { width: 58px; height: 19px; background: #ffffff; border-top: 2px solid #808080; border-left: 2px solid #808080; border-right: 2px solid #ffffff; border-bottom: 2px solid #ffffff; box-shadow: inset 1px 1px 0 #000000; font-family: "Courier New", monospace; font-size: 11px; font-weight: bold; padding: 1px 4px; text-align: right; color: #000000; display: flex; align-items: center; justify-content: flex-end; }
+
+.speed-control-box { display: flex; flex-direction: column; gap: 2px; background: #c0c0c0; border: 1px solid #808080; padding: 3px 4px; flex-shrink: 0; }
+.speed-row { display: flex; align-items: center; justify-content: space-between; }
+input[type="range"].win-slider { -webkit-appearance: none; width: 100%; height: 14px; background: transparent; outline: none; }
+input[type="range"].win-slider::-webkit-slider-runnable-track { height: 4px; background: #808080; border-bottom: 1px solid #ffffff; }
+input[type="range"].win-slider::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 10px; background: #c0c0c0; border-top: 1px solid #ffffff; border-left: 1px solid #ffffff; border-right: 1px solid #000000; border-bottom: 1px solid #000000; margin-top: -6px; cursor: pointer; }
+.win-progress-frame { height: 12px; background: #ffffff; border-top: 2px solid #808080; border-left: 2px solid #808080; border-right: 2px solid #ffffff; border-bottom: 2px solid #ffffff; box-shadow: inset 1px 1px 0 #000000; display: flex; gap: 2px; padding: 1px; overflow: hidden; }
+.win-progress-segment { width: 6px; height: 100%; background: #000080; flex-shrink: 0; display: none; }
+
+.disasm-box { background: #ffffff; border-top: 2px solid #808080; border-left: 2px solid #808080; border-right: 2px solid #ffffff; border-bottom: 2px solid #ffffff; box-shadow: inset 1px 1px 0 #000000; padding: 2px 4px; display: flex; flex-direction: column; gap: 1px; font-family: "Courier New", monospace; font-size: 10px; height: 52px; overflow-y: auto; flex-shrink: 0; }
+.disasm-row { display: flex; justify-content: space-between; padding: 1px 2px; }
+.disasm-row.active { background: #000080; color: #ffffff; }
+
+.mem-container { flex: 1; display: flex; flex-direction: column; min-height: 0; background: #c0c0c0; border: 1px solid #808080; padding: 2px; }
+.mem-viewer-frame { flex: 1; background: #ffffff; border-top: 2px solid #808080; border-left: 2px solid #808080; border-right: 2px solid #ffffff; border-bottom: 2px solid #ffffff; box-shadow: inset 1px 1px 0 #000000; font-family: "Courier New", monospace; font-size: 10px; padding: 2px 4px; overflow-y: auto; min-height: 0; }
+.mem-table { width: 100%; border-collapse: collapse; }
+.mem-table th { color: #808080; text-align: center; font-weight: normal; border-bottom: 1px solid #e0e0e0; position: sticky; top: 0; background: #ffffff; }
+.mem-table td { text-align: center; padding: 1px 2px; cursor: pointer; }
+.mem-table td:hover { outline: 1px solid #000080; }
+.mem-addr { color: #000080; font-weight: bold; text-align: left !important; cursor: default !important; }
+.mem-byte.flash { background-color: #000080; color: #ffffff; }
+.mem-status-bar { font-size: 10px; padding: 2px 4px; background: #c0c0c0; border-top: 1px solid #808080; color: #000080; font-weight: bold; height: 18px; line-height: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.right-column { display: flex; flex-direction: column; gap: 4px; min-height: 0; overflow: hidden; }
+.canvas-subwindow { background: #c0c0c0; border-top: 2px solid #ffffff; border-left: 2px solid #ffffff; border-right: 2px solid #000000; border-bottom: 2px solid #000000; box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080; padding: 3px; display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 100%; }
+.canvas-title { width: 100%; background: #808080; color: #ffffff; font-size: 10px; font-weight: bold; padding: 1px 4px; margin-bottom: 3px; }
+.canvas-screen { background: #ffffff; border-top: 2px solid #000000; border-left: 2px solid #000000; border-right: 2px solid #ffffff; border-bottom: 2px solid #ffffff; box-shadow: inset 1px 1px 0 #808080; width: 100%; max-width: 280px; aspect-ratio: 1 / 1; display: flex; }
+canvas#vram-canvas { width: 100%; height: 100%; image-rendering: pixelated; image-rendering: crisp-edges; display: block; }
+
+.sys-info-frame { flex: 1; background: #ffffff; border-top: 2px solid #808080; border-left: 2px solid #808080; border-right: 2px solid #ffffff; border-bottom: 2px solid #ffffff; box-shadow: inset 1px 1px 0 #000000; padding: 4px 6px; font-family: "Courier New", monospace; font-size: 10px; overflow-y: auto; min-height: 0; display: flex; flex-direction: column; gap: 2px; word-wrap: break-word; }
+.sys-info-row { display: flex; justify-content: space-between; word-wrap: break-word; }
+.sys-info-row span.k { color: #555555; }
+.sys-info-row span.v { font-weight: bold; color: #000000; }
+
+.console-panel { grid-column: 1 / -1; border-top: 2px solid #808080; border-left: 2px solid #808080; border-right: 2px solid #ffffff; border-bottom: 2px solid #ffffff; background: #c0c0c0; padding: 4px 6px 6px 6px; display: flex; flex-direction: column; position: relative; min-height: 0; overflow: hidden; }
+.console-screen { flex: 1; background: #000000; color: #00ff00; border-top: 2px solid #000000; border-left: 2px solid #000000; border-right: 2px solid #ffffff; border-bottom: 2px solid #ffffff; box-shadow: inset 1px 1px 0 #808080; font-family: "Courier New", monospace; font-size: 11px; padding: 4px 6px; overflow-y: auto; white-space: pre-wrap; min-height: 0; }
+.console-err { color: #ff3333; font-weight: bold; }
+.console-success { color: #00ff00; font-weight: bold; }
+
+.win-statusbar { height: 20px; background: #c0c0c0; border-top: 1px solid #808080; display: flex; align-items: center; gap: 4px; padding: 2px 4px; flex-shrink: 0; }
+.status-cell { background: #c0c0c0; border-top: 1px solid #808080; border-left: 1px solid #808080; border-right: 1px solid #ffffff; border-bottom: 1px solid #ffffff; padding: 1px 6px; font-size: 10px; color: #000000; height: 16px; display: flex; align-items: center; }
+.status-cell.main { flex: 1; transition: background-color 0.2s; }
+
+/* Modals */
+.modal-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.2); display: none; align-items: center; justify-content: center; z-index: 200; }
+.modal-dialog { width: 500px; background: #c0c0c0; border-top: 2px solid #ffffff; border-left: 2px solid #ffffff; border-right: 2px solid #000000; border-bottom: 2px solid #000000; box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080, 4px 4px 10px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
+.modal-body { padding: 14px; font-size: 11px; line-height: 1.5; display: flex; flex-direction: column; gap: 12px; max-height: 500px; overflow-y: auto; }
+.modal-body table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.modal-body th, .modal-body td { border: 1px solid #808080; padding: 2px 4px; text-align: left; }
+.modal-footer { padding: 8px 14px; display: flex; justify-content: center; }
+
+/* Manual Notepad Style */
+.manual-body { background: #ffffff; border-top: 2px solid #808080; border-left: 2px solid #808080; border-right: 2px solid #ffffff; border-bottom: 2px solid #ffffff; box-shadow: inset 1px 1px 0 #000000; padding: 10px; font-family: "Courier New", monospace; font-size: 12px; color: #000000; white-space: pre-wrap; height: 400px; overflow-y: auto; }
+
+/* ===== Added: selection, floating windows, popups ===== */
+.desktop-icon { outline: none; }
+.desktop-icon.selected .desktop-icon-text { background: #000080; outline: 1px dotted #ffffff; color: #ffffff; }
+.desktop-icon.selected svg { opacity: 0.8; }
+
+.float-win { position: absolute; z-index: 300; display: none; flex-direction: column; background: #c0c0c0; border-top: 2px solid #ffffff; border-left: 2px solid #ffffff; border-right: 2px solid #000000; border-bottom: 2px solid #000000; box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080, 4px 4px 10px rgba(0,0,0,0.5); max-width: calc(100vw - 8px); }
+.float-handle { cursor: default; touch-action: none; }
+.title-with-icon { display: flex; align-items: center; gap: 5px; }
+.title-with-icon svg { width: 14px; height: 14px; }
+.float-body { padding: 4px; display: flex; flex-direction: column; gap: 4px; }
+
+.explorer-address { display: flex; align-items: center; gap: 6px; padding: 2px; }
+.addr-field { flex: 1; background: #ffffff; border-top: 2px solid #808080; border-left: 2px solid #808080; border-right: 2px solid #ffffff; border-bottom: 2px solid #ffffff; box-shadow: inset 1px 1px 0 #000000; padding: 2px 4px; font-family: "Courier New", monospace; font-size: 11px; }
+.explorer-view { background: #ffffff; border-top: 2px solid #808080; border-left: 2px solid #808080; border-right: 2px solid #ffffff; border-bottom: 2px solid #ffffff; box-shadow: inset 1px 1px 0 #000000; min-height: 170px; padding: 10px; display: flex; align-items: flex-start; flex-wrap: wrap; gap: 8px; }
+.file-item { width: 84px; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 4px 2px; cursor: default; text-align: center; outline: none; }
+.file-item svg { width: 36px; height: 36px; }
+.file-item span { padding: 1px 4px; border: 1px solid transparent; }
+.file-item.selected span { background: #000080; color: #ffffff; border: 1px dotted #ffffff; }
+.file-item.selected svg { opacity: 0.75; }
+#win-folder .win-statusbar { margin: 0 -4px -4px -4px; }
+
+.manual-body { user-select: text; max-height: 70vh; }
+.clock-stats { height: 16px; background: #ffffff; border-top: 2px solid #808080; border-left: 2px solid #808080; border-right: 2px solid #ffffff; border-bottom: 2px solid #ffffff; box-shadow: inset 1px 1px 0 #000000; font-family: "Courier New", monospace; font-size: 10px; padding: 0 4px; display: flex; align-items: center; justify-content: space-between; white-space: nowrap; overflow: hidden; }
+.clock-input { flex: 1; min-width: 0; height: 21px; background: #ffffff; border-top: 2px solid #808080; border-left: 2px solid #808080; border-right: 2px solid #ffffff; border-bottom: 2px solid #ffffff; box-shadow: inset 1px 1px 0 #000000; font-family: "Courier New", monospace; font-size: 11px; font-weight: bold; padding: 1px 4px; text-align: right; user-select: text; outline: none; }
+.clock-preset { height: 21px; font-family: inherit; font-size: 11px; background: #c0c0c0; border: 2px solid; border-color: #ffffff #000000 #000000 #ffffff; }
+
+.popup-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.18); display: none; align-items: center; justify-content: center; z-index: 9000; }
+.popup-dialog { width: 360px; max-width: calc(100vw - 16px); background: #c0c0c0; border-top: 2px solid #ffffff; border-left: 2px solid #ffffff; border-right: 2px solid #000000; border-bottom: 2px solid #000000; box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080, 4px 4px 10px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
+.popup-body { display: flex; gap: 14px; padding: 16px 14px 10px; align-items: flex-start; }
+.popup-body svg { width: 32px; height: 32px; flex-shrink: 0; }
+.popup-msg { white-space: pre-wrap; line-height: 1.45; font-size: 11px; user-select: text; }
+.popup-footer { display: flex; justify-content: center; padding: 6px 14px 12px; }
+</style>
+</head>
+<body>
+
+<a href="https://github.com/koiafk" target="_blank" rel="noopener noreferrer" class="desktop-icon" id="icon-github" title="github.com/koiafk">
+  <svg viewBox="0 0 32 32" shape-rendering="crispEdges">
+    <rect x="2.5" y="2.5" width="27" height="21" fill="#c0c0c0" stroke="#000"/>
+    <path d="M3.5 22.5V3.5H28.5" fill="none" stroke="#fff"/>
+    <path d="M28.5 4V22.5H4" fill="none" stroke="#808080"/>
+    <rect x="6.5" y="6.5" width="19" height="13" fill="#000080" stroke="#000"/>
+    <circle cx="16" cy="13" r="5.5" fill="#1e90ff"/>
+    <path d="M12 10h3v2h-2v2h-1zM17 11h3v3h-2v1h-1z" fill="#00c000"/>
+    <path d="M12 8.5h5M10.5 13H21.5" stroke="#bfe4ff" stroke-width="0.6" opacity="0.7"/>
+    <rect x="23" y="21" width="2" height="1" fill="#00ff00"/>
+    <rect x="12.5" y="23.5" width="7" height="3" fill="#c0c0c0" stroke="#000"/>
+    <rect x="8.5" y="26.5" width="15" height="3" fill="#c0c0c0" stroke="#000"/>
+    <path d="M13 24h6M9 27h14" stroke="#fff"/>
+  </svg>
+  <span class="desktop-icon-text">GitHub</span>
+</a>
+
+<div class="desktop-icon" id="icon-docs" tabindex="0" role="button" title="Double-click to open">
+  <svg viewBox="0 0 64 64" width="48" height="48">
+    <path d="M 6 14 L 22 14 L 28 20 L 58 20 L 58 54 L 6 54 Z" fill="#dfb900" stroke="#000" stroke-width="1.5"/>
+    <path d="M 14 26 L 50 26 L 50 48 L 14 48 Z" fill="#ffffff" stroke="#000" stroke-width="1"/>
+    <line x1="20" y1="30" x2="44" y2="30" stroke="#0000ff" stroke-width="1.5"/>
+    <line x1="20" y1="34" x2="40" y2="34" stroke="#0000ff" stroke-width="1.5"/>
+    <line x1="20" y1="38" x2="46" y2="38" stroke="#0000ff" stroke-width="1.5"/>
+    <path d="M 6 24 L 58 24 L 52 54 L 6 54 Z" fill="#ffe44d" stroke="#000" stroke-width="1.5"/>
+    <path d="M 6 24 L 58 24" stroke="#fff" stroke-width="1" opacity="0.6"/>
+  </svg>
+  <span class="desktop-icon-text">Documentation</span>
+</div>
+
+<input type="file" id="file-picker" accept=".asm,.txt" style="display: none;">
+
+<div class="win-window">
+  <div class="win-titlebar">
+    <span>koiafk OS v1.0 - [Fantasy Console 16-Bit]</span>
+    <div class="win-titlebar-buttons">
+      <div class="win-titlebar-btn" id="btn-win-min">_</div>
+      <div class="win-titlebar-btn" id="btn-win-max">&#9633;</div>
+      <div class="win-titlebar-btn" id="btn-win-close">&#10005;</div>
+    </div>
+  </div>
+
+  <div class="win-menubar">
+    <div class="win-menu-item" id="menu-file">
+      <u>F</u>ile
+      <div class="win-dropdown" id="dropdown-file">
+        <div class="win-dropdown-item win-dropdown-sub">
+          <span>Load Demo</span><span>&#9656;</span>
+          <div class="win-sub-menu">
+            <div class="win-dropdown-item" id="demo-fill">Full Screen Fill</div>
+            <div class="win-dropdown-item" id="demo-diagonal">Diagonal Stripes</div>
+            <div class="win-dropdown-item" id="demo-checker">Checkerboard</div>
+            <div class="win-dropdown-item" id="demo-border">Border Frame</div>
+            <div class="win-dropdown-item" id="demo-clear">Clear Screen</div>
+          </div>
+        </div>
+        <div class="win-dropdown-item" id="action-load-file">Load Assembly...</div>
+        <div class="win-dropdown-item" id="action-save-file">Save Assembly...</div>
+        <div class="win-dropdown-item" id="action-clear">Clear Editor</div>
+      </div>
+    </div>
+    <div class="win-menu-item" id="menu-view">
+      <u>V</u>iew
+      <div class="win-dropdown" id="dropdown-view">
+        <div class="win-dropdown-item" id="action-toggle-grid">Grid Toggle [OFF]</div>
+      </div>
+    </div>
+    <div class="win-menu-item" id="menu-help">
+      <u>H</u>elp
+      <div class="win-dropdown" id="dropdown-help">
+        <div class="win-dropdown-item" id="action-manual">Manual...</div>
+        <div class="win-dropdown-item" id="action-isa">Instruction Set...</div>
+        <div class="win-dropdown-item" id="action-about">About...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="win-toolbar">
+    <button class="win-btn" id="btn-assemble" title="Parse the text into machine code and reset the CPU.">Assemble</button>
+    <button class="win-btn" id="btn-step" title="Execute one instruction.">Step</button>
+    <button class="win-btn" id="btn-run" title="Execute instructions continuously.">Run</button>
+    <button class="win-btn" id="btn-reset" title="Clear memory and reset the CPU.">Reset</button>
+  </div>
+
+  <div class="win-main-body">
+    <div class="win-panel">
+      <div class="win-panel-header">Source Code Editor</div>
+      <div class="editor-frame">
+        <div class="gutter" id="line-nums"></div>
+        <div class="editor-wrapper">
+          <div id="line-marker"></div>
+          <textarea id="code-input" spellcheck="false"></textarea>
+        </div>
+      </div>
+      <div class="err-box" id="err-log"></div>
+    </div>
+
+    <div class="win-panel mid-column">
+      <div class="win-panel-header">CPU & Memory Subsystem</div>
+      <div class="reg-table">
+        <div class="field-row"><span title="Accumulator">Reg A:</span><div class="win-input" id="reg-a">00</div></div>
+        <div class="field-row"><span title="Index Register X">Reg X:</span><div class="win-input" id="reg-x">00</div></div>
+        <div class="field-row"><span title="Index Register Y">Reg Y:</span><div class="win-input" id="reg-y">00</div></div>
+        <div class="field-row"><span title="Zero Flag">Zero Flag:</span><div class="win-input" id="reg-zf">0</div></div>
+        <div class="field-row"><span title="Program Counter">Prog (PC):</span><div class="win-input" id="reg-pc">0000</div></div>
+        <div class="field-row"><span title="Stack Pointer">Stack (SP):</span><div class="win-input" id="reg-sp">FFFF</div></div>
+      </div>
+
+      <div class="speed-control-box">
+        <div class="speed-row">
+          <span>Clock Speed: <strong id="speed-val">2000</strong> Hz</span>
+          <span>MMIO [0xFF00]: <strong id="mmio-val">00</strong></span>
+        </div>
+        <div class="speed-row" style="gap:4px;">
+          <input type="text" inputmode="numeric" class="clock-input" id="clock-input" value="2000" spellcheck="false" title="Type a clock speed in Hz (1 to 1,000,000) and press Enter">
+          <select class="clock-preset" id="clock-preset" title="Clock presets">
+            <option value="">Presets...</option>
+            <option value="1">1 Hz (slow-mo)</option>
+            <option value="60">60 Hz</option>
+            <option value="1000">1 kHz</option>
+            <option value="2000">2 kHz (default)</option>
+            <option value="1000000">1 MHz (6502 class)</option>
+          </select>
+        </div>
+        <div class="clock-stats" id="clock-stats" title="Instructions executed since the last restart, and the speed actually achieved">Executed: 0 | Actual: 0 Hz</div>
+      </div>
+
+      <div class="disasm-box" id="disasm-items"></div>
+
+      <div class="mem-container">
+        <div class="mem-viewer-frame" id="mem-viewer-frame">
+          <table class="mem-table" id="mem-table"></table>
+        </div>
+        <div class="mem-status-bar" id="mem-info-bar">Click a byte to inspect address</div>
+      </div>
+    </div>
+
+    <div class="win-panel right-column">
+      <div class="win-panel-header">Video Memory (VRAM)</div>
+      <div class="canvas-subwindow">
+        <div class="canvas-title">Display: 64x64 Monochrome</div>
+        <div class="canvas-screen">
+          <canvas id="vram-canvas" width="64" height="64"></canvas>
+        </div>
+      </div>
+
+      <div class="sys-info-frame">
+        <div class="sys-info-row"><span class="k">Author:</span><span class="v">koiafk</span></div>
+        <div class="sys-info-row"><span class="k">Arch:</span><span class="v">8-bit, 16-bit addr</span></div>
+        <div class="sys-info-row"><span class="k">RAM:</span><span class="v">64KB</span></div>
+        <div class="sys-info-row"><span class="k">VRAM:</span><span class="v">0x8000</span></div>
+        <div class="sys-info-row"><span class="k">Stack:</span><span class="v">0xFFFF</span></div>
+        <div class="sys-info-row"><span class="k">IO Port:</span><span class="v">0xFF00 (Keys)</span></div>
+        <div class="sys-info-row"><span class="k">Status:</span><span class="v" id="sys-info-status">READY</span></div>
+      </div>
+    </div>
+
+    <div class="console-panel">
+      <div class="win-panel-header" style="border:none; margin:0; padding: 0 0 2px 0;">System Console</div>
+      <div class="console-screen" id="console-output">C:\DOS> FCONSOLE.EXE --init&#10;System initialized by koiafk. 64KB RAM mapped. VRAM at 0x8000 ready.&#10;> Double-click the "Documentation" folder on the desktop, then double-click guide.md.</div>
+    </div>
+  </div>
+
+  <div class="win-statusbar">
+    <div class="status-cell main" id="cpu-status">Ready</div>
+    <div class="status-cell" id="line-counter">0 lines</div>
+    <div class="status-cell">VRAM: 0x8000</div>
+    <div class="status-cell">RAM: 64KB</div>
+  </div>
+
+  <!-- About Dialog -->
+  <div class="modal-overlay" id="modal-about">
+    <div class="modal-dialog">
+      <div class="win-titlebar">
+        <span>About</span>
+        <div class="win-titlebar-btn" id="modal-about-close">&#10005;</div>
+      </div>
+      <div class="modal-body">
+        <p><strong>Fantasy Console 16-Bit</strong></p>
+        <p>Built from scratch by <b>koiafk</b> in a single HTML file. Features a custom assembler, 16-bit CPU, and memory-mapped VRAM.</p>
+        <p>Memory: 65,536 Bytes. VRAM: 0x8000-0x8FFF. Stack: 0xFF00-0xFFFF. Keyboard MMIO: 0xFF00.</p>
+        <p>© 2026 koiafk. All rights reserved.</p>
+      </div>
+      <div class="modal-footer"><button class="win-btn" id="modal-about-ok" style="width: 70px;">OK</button></div>
+    </div>
+  </div>
+
+  <!-- ISA Dialog -->
+  <div class="modal-overlay" id="modal-isa">
+    <div class="modal-dialog">
+      <div class="win-titlebar">
+        <span>Instruction Set Architecture</span>
+        <div class="win-titlebar-btn" id="modal-isa-close">&#10005;</div>
+      </div>
+      <div class="modal-body">
+        <table>
+          <tr><th>Opcode</th><th>Mnemonic</th><th>Arg</th><th>Description</th></tr>
+          <tr><td>0x01</td><td>LDA</td><td>#val</td><td>Load immediate value into A</td></tr>
+          <tr><td>0x02</td><td>LDX</td><td>#val</td><td>Load immediate value into X</td></tr>
+          <tr><td>0x03</td><td>STA</td><td>addr,X</td><td>Store A into memory at addr + X</td></tr>
+          <tr><td>0x04</td><td>ADD</td><td>#val</td><td>Add immediate value to A</td></tr>
+          <tr><td>0x05</td><td>SUB</td><td>#val</td><td>Subtract immediate value from A</td></tr>
+          <tr><td>0x06</td><td>INC</td><td>X</td><td>Increment X</td></tr>
+          <tr><td>0x07</td><td>CMP</td><td>#val</td><td>Compare A to val (sets Zero Flag)</td></tr>
+          <tr><td>0x08</td><td>JMP</td><td>addr</td><td>Jump to addr</td></tr>
+          <tr><td>0x09</td><td>JZ</td><td>addr</td><td>Jump to addr if Zero Flag is 1</td></tr>
+          <tr><td>0x0A</td><td>PUSH</td><td>A</td><td>Push A to stack</td></tr>
+          <tr><td>0x0B</td><td>POP</td><td>A</td><td>Pop stack into A</td></tr>
+          <tr><td>0x0C</td><td>CALL</td><td>addr</td><td>Push PC to stack, jump to addr</td></tr>
+          <tr><td>0x0D</td><td>RET</td><td></td><td>Pop stack into PC</td></tr>
+          <tr><td>0x0E</td><td>HLT</td><td></td><td>Halt execution</td></tr>
+          <tr><td>0x0F</td><td>TAX</td><td></td><td>Transfer A to X</td></tr>
+          <tr><td>0x10</td><td>TXA</td><td></td><td>Transfer X to A</td></tr>
+          <tr><td>0x11</td><td>INC Y</td><td></td><td>Increment Y</td></tr>
+          <tr><td>0x12</td><td>TAY</td><td></td><td>Transfer A to Y</td></tr>
+          <tr><td>0x13</td><td>TYA</td><td></td><td>Transfer Y to A</td></tr>
+        </table>
+      </div>
+      <div class="modal-footer"><button class="win-btn" id="modal-isa-ok" style="width: 70px;">OK</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- Documentation folder window -->
+<div class="float-win" id="win-folder" style="left:170px; top:80px; width:430px;">
+  <div class="win-titlebar float-handle">
+    <span class="title-with-icon">
+      <svg viewBox="0 0 64 64"><path d="M 6 14 L 22 14 L 28 20 L 58 20 L 58 54 L 6 54 Z" fill="#dfb900" stroke="#000" stroke-width="3"/><path d="M 6 24 L 58 24 L 52 54 L 6 54 Z" fill="#ffe44d" stroke="#000" stroke-width="3"/></svg>
+      Documentation
+    </span>
+    <div class="win-titlebar-buttons"><div class="win-titlebar-btn" data-close="win-folder">&#10005;</div></div>
+  </div>
+  <div class="float-body">
+    <div class="explorer-address"><span>Address</span><div class="addr-field">C:\koiafk\Documentation</div></div>
+    <div class="explorer-view">
+      <div class="file-item" id="file-guide" tabindex="0" title="Double-click to open">
+        <svg viewBox="0 0 48 48">
+          <path d="M8 3 H30 L40 13 V45 H8 Z" fill="#ffffff" stroke="#000" stroke-width="1.5"/>
+          <path d="M30 3 V13 H40" fill="#dfdfdf" stroke="#000" stroke-width="1.5"/>
+          <line x1="13" y1="18" x2="27" y2="18" stroke="#808080" stroke-width="1.5"/>
+          <line x1="13" y1="23" x2="35" y2="23" stroke="#808080" stroke-width="1.5"/>
+          <rect x="11" y="29" width="26" height="12" fill="#000080"/>
+          <text x="24" y="38.5" font-size="9.5" font-weight="bold" fill="#ffffff" text-anchor="middle" font-family="Tahoma, Arial, sans-serif">MD</text>
+        </svg>
+        <span>guide.md</span>
+      </div>
+    </div>
+    <div class="win-statusbar" style="margin:0 -4px -4px -4px;">
+      <div class="status-cell main">1 object(s)</div>
+      <div class="status-cell">Double-click guide.md to open it</div>
+    </div>
+  </div>
+</div>
+
+<!-- guide.md (Notepad) window -->
+<div class="float-win" id="win-guide" style="left:230px; top:110px; width:540px;">
+  <div class="win-titlebar float-handle">
+    <span class="title-with-icon">
+      <svg viewBox="0 0 48 48"><path d="M8 3 H30 L40 13 V45 H8 Z" fill="#ffffff" stroke="#000" stroke-width="3"/><rect x="11" y="29" width="26" height="12" fill="#000080"/></svg>
+      guide.md - Notepad
+    </span>
+    <div class="win-titlebar-buttons"><div class="win-titlebar-btn" data-close="win-guide">&#10005;</div></div>
+  </div>
+  <div class="float-body">
+    <div class="manual-body">================================================
+  koiafk OS v1.0  //  guide.md
+  "now with 100% more nostalgia"
+================================================
+
+1. WHAT IS THIS?
+A complete fantasy console in one HTML file: a tiny CPU with an
+8-bit data path and 16-bit addresses, a 2-pass assembler, 64KB of
+RAM and a 64x64 screen. You type
+assembly, it turns into machine code, the CPU runs it, pixels
+appear. That is the whole magic trick.
+
+2. 30-SECOND QUICK START
+  1. File -> Load Demo -> Checkerboard
+  2. Press Run and watch the screen fill in.
+  3. Type a clock speed in Hz (1 to 1,000,000) or pick a preset.
+     1 MHz is the speed of a real 6502.
+  4. When the program hits HLT the status bar turns green
+     and says "Success".
+  5. Press Run again. It restarts from address 0000.
+
+3. THE CPU
+  A    accumulator, 8-bit. STA can only store A.
+  X    index register, 8-bit. Added to the address in STA.
+  Y    spare register, 8-bit. Great as a loop counter.
+  PC   program counter, 16-bit.
+  SP   stack pointer, 16-bit. Starts at FFFF, grows down.
+  ZF   zero flag. 1 when the last result was zero.
+
+ADD, SUB, INC, CMP, TAX, TXA, TAY and TYA update ZF.
+LDA and LDX do not.
+
+4. WRITING CODE
+  ; this is a comment
+  loop:            ; a label (letters, digits, _)
+  LDA #5           ; '#' = this exact number, 0 to 255
+  STA 0x8000,X     ; store A at address + X
+  JZ done          ; jump to a label if ZF = 1
+
+Numbers can be decimal (32768), hex (0x8000) or $8000.
+
+The assembler is strict. If something is wrong it prints a red
+error in the console, wipes the program from memory, and the CPU
+refuses to run until you fix it. Things it will yell about:
+  - an unknown opcode
+  - an immediate without '#', or one bigger than 255
+  - STA without ",X"
+  - INC without a register (INC X or INC Y)
+  - a label that does not exist, or one defined twice
+
+5. THE "A GETS CLOBBERED" TRAP
+TXA and TYA overwrite A, and STA always stores A. So if you
+TXA inside a loop and then STA, you are storing X, not your
+pixel colour. Reload A (LDA #1) at the top of the loop.
+Every demo does this on purpose.
+
+6. MEMORY MAP
+  0000-7FFF   code and general RAM
+  8000-8FFF   video RAM, 64x64 pixels, one byte each.
+              0 = off, anything else = on.
+              pixel address = 8000 + row*64 + column
+  FF00        keyboard port (WASD or arrow keys)
+  FF00-FFFF   stack, grows downward from FFFF
+
+Only writes between 8000 and 8FFF touch the screen.
+
+7. DEMOS (File -> Load Demo)
+  Full Screen Fill   lights all 4096 pixels
+  Diagonal Stripes   diagonal lines, period 4
+  Checkerboard       classic 1x1 checker
+  Border Frame       a one-pixel frame around the screen
+  Clear Screen       switches every pixel off
+
+Assemble keeps whatever is on the screen, so you can run
+Fill, then load Clear Screen and watch it wipe. Reset clears
+everything, screen included.
+
+8. DEBUGGING
+  Step     runs one instruction
+  Gutter   click a line number to toggle a breakpoint
+  Pause    freezes the CPU, Run resumes
+  The yellow bar in the editor shows the line about to run.
+
+9. FAQ
+Q: Why does Run restart after HLT?
+A: HLT is the end of the movie. Press Run to watch it again.
+
+Q: Can my program read the keyboard?
+A: The port at FF00 is wired up, but there is no instruction
+   that loads from memory yet. For now it is decoration.
+
+Q: Why does the window not close?
+A: Click the X and find out.
+</div>
+  </div>
+</div>
+
+<!-- Funny popup for the main window buttons -->
+<div class="popup-overlay" id="popup-overlay">
+  <div class="popup-dialog">
+    <div class="win-titlebar"><span id="popup-title">koiafk OS</span><div class="win-titlebar-btn" id="popup-x">&#10005;</div></div>
+    <div class="popup-body"><div id="popup-icon"></div><div class="popup-msg" id="popup-msg"></div></div>
+    <div class="popup-footer"><button class="win-btn" id="popup-ok" style="width: 80px;">OK</button></div>
+  </div>
+</div>
+
+<script>
+/* ===================================================================
+   koiafk OS v1.0 - engine
+   All CPU state lives in ONE object (cpu). Nothing else in this file
+   is called a, x, y, pc, sp or zf, so a local variable can never
+   shadow or overwrite a CPU register.
+   =================================================================== */
+var VRAM_START = 0x8000, VRAM_END = 0x8FFF, KEY_PORT = 0xFF00, STACK_TOP = 0xFFFF;
+var MAX_HZ = 1000000;            // 1 MHz, same class as a real 6502
+var MAX_STEPS_PER_FRAME = 100000;
+var ERR_BG = "#ffcccc", OK_BG = "#aaffaa";
+
+var mem = new Uint8Array(65536);
+var cpu = { a: 0, x: 0, y: 0, pc: 0, sp: STACK_TOP, zf: 0 };
+
+var running = false, rafId = null, lastFrame = 0, carry = 0;
+var halted = false;            // true after HLT or a fault: Run/Step restart from PC 0
+var programLoaded = false;     // false after an assembly error or Reset: nothing may execute
+var sourceDirty = false;       // editor changed since the last successful assemble
+var skipBreakpointOnce = false;
+var programImage = [];         // [{addr, bytes}] of the last good assembly
+var clockHz = 2000;
+var showGrid = false, gridDirty = false;
+var breakpoints = new Set();
+var lineToAddr = {}, addrToLine = {};
+var instrCount = 0, actualHz = 0, statsT = 0, statsCount = 0; // live stats
+var dirty = new Set();         // addresses written since the last UI flush
+var viewShadow = new Uint8Array(65536); // what the memory viewer currently shows
+
+/* ---------------- DOM helpers ---------------- */
+function $(id) { return document.getElementById(id); }
+var canvas = $("vram-canvas");
+var ctx = canvas.getContext("2d");
+var codeInput = $("code-input");
+var lineNums = $("line-nums");
+var lineMarker = $("line-marker");
+var errLog = $("err-log");
+var consoleOutput = $("console-output");
+var clockInput = $("clock-input");
+var clockPreset = $("clock-preset");
+var speedVal = $("speed-val");
+var mmioVal = $("mmio-val");
+var filePicker = $("file-picker");
+
+function logConsole(msg, type) {
+  var line = document.createElement("div");
+  line.textContent = "> " + msg;
+  if (type === "err") line.className = "console-err";
+  else if (type === "success") line.className = "console-success";
+  consoleOutput.appendChild(line);
+  while (consoleOutput.children.length > 400) consoleOutput.removeChild(consoleOutput.firstChild);
+  consoleOutput.scrollTop = consoleOutput.scrollHeight;
+}
+
+function hex(v, len) { return (v >>> 0).toString(16).toUpperCase().padStart(len, "0"); }
+
+function setStatus(text, bg, sys) {
+  var cell = $("cpu-status");
+  cell.innerText = text;
+  cell.style.backgroundColor = bg || "";
+  $("sys-info-status").innerText = sys;
+}
+
+function showError(msg) { errLog.innerText = msg; errLog.style.display = "block"; }
+function clearError() { errLog.innerText = ""; errLog.style.display = "none"; }
+
+/* ---------------- Demos ---------------- */
+function pageLines(offset, comment) {
+  var out = [];
+  for (var p = 0; p < 16; p++) {
+    var base = VRAM_START + p * 256 + offset;
+    out.push("STA 0x" + hex(base, 4) + ",X" + (comment && p === 0 ? "     ; " + comment : ""));
+  }
+  return out;
+}
+
+var demoFill = [
+  "; Full Screen Fill (64x64)",
+  "; X counts 0..255. INC X sets the Zero Flag when it wraps back to 0,",
+  "; and that is what lets JZ leave the loop. A stays 1 the whole time.",
+  "LDA #1",
+  "LDX #0",
+  "",
+  "loop:"
+].concat(pageLines(0, "16 pages x 256 bytes = all 4096 pixels")).concat([
+  "INC X",
+  "JZ done",
+  "JMP loop",
+  "",
+  "done:",
+  "HLT"
+]).join("\n");
+
+var demoDiagonal = [
+  "; Diagonal Stripes (64x64)",
+  "; Each pass stores at X, then X moves +65 = one row down, one column right.",
+  "; Y counts 64 passes. A is reloaded every pass because TXA/TYA overwrite it.",
+  "LDA #0",
+  "TAY             ; Y = pass counter",
+  "LDX #0",
+  "",
+  "loop:",
+  "LDA #1"
+].concat(pageLines(0)).concat([
+  "TXA",
+  "ADD #65",
+  "TAX",
+  "INC Y",
+  "TYA",
+  "CMP #64         ; 64 passes done?",
+  "JZ done",
+  "JMP loop",
+  "",
+  "done:",
+  "HLT"
+]).join("\n");
+
+var demoChecker = (function () {
+  var body = [];
+  for (var p = 0; p < 16; p++) {
+    var base = VRAM_START + p * 256;
+    body.push("STA 0x" + hex(base, 4) + ",X" + (p === 0 ? "     ; row 0: even columns" : ""));
+    body.push("STA 0x" + hex(base + 65, 4) + ",X" + (p === 0 ? "     ; row 1: odd columns" : ""));
+    body.push("STA 0x" + hex(base + 128, 4) + ",X" + (p === 0 ? "    ; row 2: even columns" : ""));
+    body.push("STA 0x" + hex(base + 193, 4) + ",X" + (p === 0 ? "    ; row 3: odd columns" : ""));
+  }
+  return [
+    "; Checkerboard (64x64)",
+    "; X steps by 2 so every other column is hit; odd rows are shifted by 1.",
+    "LDX #0",
+    "",
+    "loop:",
+    "LDA #1"
+  ].concat(body).concat([
+    "TXA",
+    "ADD #2",
+    "TAX",
+    "CMP #64         ; X reached column 64?",
+    "JZ done",
+    "JMP loop",
+    "",
+    "done:",
+    "HLT"
+  ]).join("\n");
+})();
+
+var demoBorder = (function () {
+  var cols = [];
+  for (var p = 0; p < 16; p++) {
+    var base = VRAM_START + p * 256;
+    cols.push("STA 0x" + hex(base, 4) + ",X" + (p === 0 ? "     ; left edge" : ""));
+    cols.push("STA 0x" + hex(base + 63, 4) + ",X" + (p === 0 ? "     ; right edge" : ""));
+  }
+  return [
+    "; Border Frame (64x64)",
+    "; Part 1: top and bottom rows (X = 0..63)",
+    "LDX #0",
+    "rows:",
+    "LDA #1",
+    "STA 0x8000,X    ; top row",
+    "STA 0x8FC0,X    ; bottom row",
+    "INC X",
+    "TXA",
+    "CMP #64",
+    "JZ sides",
+    "JMP rows",
+    "",
+    "; Part 2: left and right columns (X = 0,64,128,192 = 4 rows per page)",
+    "sides:",
+    "LDX #0",
+    "cols:",
+    "LDA #1"
+  ].concat(cols).concat([
+    "TXA",
+    "ADD #64",
+    "TAX             ; wraps 192+64 -> 0, so ZF=1 ends it",
+    "JZ done",
+    "JMP cols",
+    "",
+    "done:",
+    "HLT"
+  ]).join("\n");
+})();
+
+var demoClear = [
+  "; Clear Screen",
+  "; Same loop as Full Screen Fill, but A = 0 so every pixel is switched off.",
+  "LDA #0",
+  "LDX #0",
+  "",
+  "loop:"
+].concat(pageLines(0, "16 pages x 256 bytes = all 4096 pixels")).concat([
+  "INC X",
+  "JZ done",
+  "JMP loop",
+  "",
+  "done:",
+  "HLT"
+]).join("\n");
+
+var DEMOS = {
+  "demo-fill": { name: "Full Screen Fill", code: demoFill },
+  "demo-diagonal": { name: "Diagonal Stripes", code: demoDiagonal },
+  "demo-checker": { name: "Checkerboard", code: demoChecker },
+  "demo-border": { name: "Border Frame", code: demoBorder },
+  "demo-clear": { name: "Clear Screen", code: demoClear }
+};
+
+/* ---------------- Memory viewer ---------------- */
+function buildMemoryViewer() {
+  var parts = ["<tr><th>Addr</th><th>00</th><th>01</th><th>02</th><th>03</th><th>04</th><th>05</th><th>06</th><th>07</th></tr>"];
+  for (var base = 0; base < 65536; base += 8) {
+    parts.push("<tr><td class='mem-addr'>$" + hex(base, 4) + "</td>");
+    for (var col = 0; col < 8; col++) {
+      parts.push("<td class='mem-byte' id='mcell-" + (base + col) + "'>00</td>");
+    }
+    parts.push("</tr>");
+  }
+  $("mem-table").innerHTML = parts.join("");
+}
+
+function inspectMem(addr) {
+  $("mem-info-bar").innerText = "Address: 0x" + hex(addr, 4) + ", Value: " + hex(mem[addr], 2);
+}
+
+function markDirty(addr) { dirty.add(addr); }
+
+function flashCell(el) {
+  el.classList.add("flash");
+  setTimeout(function () { el.classList.remove("flash"); }, 180);
+}
+
+// Full diff: update every cell whose value differs from what the viewer shows.
+function syncMemoryViewer() {
+  for (var i = 0; i < 65536; i++) {
+    if (mem[i] !== viewShadow[i]) {
+      var el = $("mcell-" + i);
+      if (el) el.textContent = hex(mem[i], 2);
+      viewShadow[i] = mem[i];
+    }
+  }
+  dirty.clear();
+}
+
+// Cheap per-frame update: only the addresses the CPU wrote.
+function flushDirty() {
+  if (dirty.size) {
+    var flash = dirty.size <= 64;
+    dirty.forEach(function (addr) {
+      var el = $("mcell-" + addr);
+      if (el) {
+        el.textContent = hex(mem[addr], 2);
+        if (flash) flashCell(el);
+      }
+      viewShadow[addr] = mem[addr];
+    });
+    dirty.clear();
+  }
+  if (showGrid && gridDirty) { drawGridOverlay(); gridDirty = false; }
+}
+
+/* ---------------- Video ---------------- */
+function renderPixel(addr) {
+  var pixelIndex = addr - VRAM_START;
+  var px = pixelIndex % 64;
+  var py = Math.floor(pixelIndex / 64);
+  ctx.fillStyle = (mem[addr] !== 0) ? "#000080" : "#ffffff";
+  ctx.fillRect(px, py, 1, 1);
+  if (showGrid) gridDirty = true;
+}
+
+function redrawAllVRAM() {
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, 64, 64);
+  ctx.fillStyle = "#000080";
+  for (var addr = VRAM_START; addr <= VRAM_END; addr++) {
+    if (mem[addr] !== 0) {
+      var pixelIndex = addr - VRAM_START;
+      ctx.fillRect(pixelIndex % 64, Math.floor(pixelIndex / 64), 1, 1);
+    }
+  }
+  if (showGrid) drawGridOverlay();
+  gridDirty = false;
+}
+
+function drawGridOverlay() {
+  ctx.strokeStyle = "rgba(128, 128, 128, 0.4)";
+  ctx.lineWidth = 0.5;
+  for (var g = 0; g <= 64; g += 8) {
+    ctx.beginPath();
+    ctx.moveTo(g, 0); ctx.lineTo(g, 64);
+    ctx.moveTo(0, g); ctx.lineTo(64, g);
+    ctx.stroke();
+  }
+}
+
+/* ---------------- Machine reset helpers ---------------- */
+function resetCpuState() {
+  cpu.a = 0; cpu.x = 0; cpu.y = 0; cpu.pc = 0; cpu.zf = 0;
+  cpu.sp = STACK_TOP;
+  halted = false;
+  carry = 0;
+  instrCount = 0; actualHz = 0;
+}
+
+// Wipes RAM. keepVram=true leaves the screen alone (Assemble); false wipes it too (Reset).
+function resetMachine(keepVram) {
+  stopRun();
+  var vram = keepVram ? mem.slice(VRAM_START, VRAM_END + 1) : null;
+  mem.fill(0);
+  if (vram) mem.set(vram, VRAM_START);
+  resetCpuState();
+  mmioVal.innerText = "00";
+  redrawAllVRAM();
+}
+
+function loadImage() {
+  for (var k = 0; k < programImage.length; k++) {
+    var entry = programImage[k];
+    for (var b = 0; b < entry.bytes.length; b++) {
+      mem[entry.addr + b] = entry.bytes[b];
+      markDirty(entry.addr + b);
+    }
+  }
+}
+
+/* ---------------- Assembler (2 passes) ---------------- */
+var OPCODES = {
+  LDA: { code: 0x01, mode: "imm" }, LDX: { code: 0x02, mode: "imm" },
+  STA: { code: 0x03, mode: "abx" },
+  ADD: { code: 0x04, mode: "imm" }, SUB: { code: 0x05, mode: "imm" }, CMP: { code: 0x07, mode: "imm" },
+  JMP: { code: 0x08, mode: "abs" }, JZ: { code: 0x09, mode: "abs" }, CALL: { code: 0x0C, mode: "abs" },
+  PUSH: { code: 0x0A, mode: "acc" }, POP: { code: 0x0B, mode: "acc" },
+  RET: { code: 0x0D, mode: "none" }, HLT: { code: 0x0E, mode: "none" },
+  TAX: { code: 0x0F, mode: "none" }, TXA: { code: 0x10, mode: "none" },
+  TAY: { code: 0x12, mode: "none" }, TYA: { code: 0x13, mode: "none" }
+};
+var IDENT_RE = /^[A-Za-z_][A-Za-z0-9_]*$/;
+
+function parseNumber(tok) {
+  tok = tok.trim();
+  if (/^0x[0-9a-f]+$/i.test(tok)) return parseInt(tok.slice(2), 16);
+  if (/^\$[0-9a-f]+$/i.test(tok)) return parseInt(tok.slice(1), 16);
+  if (/^[0-9]+$/.test(tok)) return parseInt(tok, 10);
+  return NaN;
+}
+
+function asmError(lineIdx, msg) { return new Error("Line " + (lineIdx + 1) + ": " + msg); }
+
+// Turns the operand text of one instruction into bytes (labels become placeholders).
+function encodeInstruction(lineIdx, op, arg) {
+  var info, v, tok, m;
+
+  if (op === "INC") {
+    var reg = arg.toUpperCase();
+    if (reg === "X") return { bytes: [0x06], ref: null };
+    if (reg === "Y") return { bytes: [0x11], ref: null };
+    throw asmError(lineIdx, "INC needs a register: write 'INC X' or 'INC Y'");
+  }
+
+  info = OPCODES[op];
+  if (!info) throw asmError(lineIdx, "Unknown opcode '" + op + "'");
+
+  switch (info.mode) {
+    case "none":
+      if (arg !== "") throw asmError(lineIdx, op + " takes no operand (found '" + arg + "')");
+      return { bytes: [info.code], ref: null };
+
+    case "acc":
+      if (arg !== "" && arg.toUpperCase() !== "A") throw asmError(lineIdx, op + " only works on A (write '" + op + "' or '" + op + " A')");
+      return { bytes: [info.code], ref: null };
+
+    case "imm":
+      m = arg.match(/^#\s*(\S+)$/);
+      if (!m) throw asmError(lineIdx, op + " needs an immediate value like '" + op + " #5'");
+      v = parseNumber(m[1]);
+      if (isNaN(v)) throw asmError(lineIdx, "Invalid number '" + m[1] + "'");
+      if (v < 0 || v > 255) throw asmError(lineIdx, "Value " + v + " does not fit in 8 bits (0-255)");
+      return { bytes: [info.code, v], ref: null };
+
+    case "abx":
+      m = arg.match(/^([^,\s]+)\s*,\s*[xX]$/);
+      if (!m) throw asmError(lineIdx, op + " must look like '" + op + " addr,X' (found '" + arg + "')");
+      tok = m[1];
+      break;
+
+    case "abs":
+      if (!/^\S+$/.test(arg)) throw asmError(lineIdx, op + " needs exactly one address or label");
+      tok = arg;
+      break;
+  }
+
+  // abx / abs: numeric address or a label resolved in pass 2
+  if (IDENT_RE.test(tok)) return { bytes: [info.code, 0, 0], ref: tok };
+  v = parseNumber(tok);
+  if (isNaN(v)) throw asmError(lineIdx, "Invalid address '" + tok + "'");
+  if (v < 0 || v > 0xFFFF) throw asmError(lineIdx, "Address " + v + " is outside 0x0000-0xFFFF");
+  return { bytes: [info.code, (v >> 8) & 0xFF, v & 0xFF], ref: null };
+}
+
+function failAssembly(message) {
+  // Kill everything so no ghost program from an earlier assembly can run.
+  programLoaded = false;
+  programImage = [];
+  lineToAddr = {}; addrToLine = {};
+  resetMachine(true);
+  syncMemoryViewer();
+  updateUI();
+  showError(message);
+  logConsole("ERROR: " + message, "err");
+  logConsole("Program memory cleared. Fix the error and press Assemble.", "err");
+  setStatus("Assembly Error", ERR_BG, "ERROR");
+  return false;
+}
+
+function assemble() {
+  stopRun();
+  clearError();
+
+  var lines = codeInput.value.split("\n");
+  var labels = Object.create(null);
+  var items = [];
+  var addr = 0;
+
+  try {
+    // ---- Pass 1: syntax, sizes, label addresses ----
+    for (var i = 0; i < lines.length; i++) {
+      var text = lines[i];
+      var ci = text.indexOf(";");
+      if (ci !== -1) text = text.slice(0, ci);
+      text = text.trim();
+      if (!text) continue;
+
+      var lm;
+      while ((lm = text.match(/^([^\s:]+)\s*:\s*(.*)$/))) {
+        var name = lm[1];
+        if (!IDENT_RE.test(name)) throw asmError(i, "Invalid label name '" + name + "' (use letters, digits and _, not starting with a digit)");
+        if (name in labels) throw asmError(i, "Duplicate label '" + name + "'");
+        labels[name] = addr;
+        text = lm[2].trim();
+      }
+      if (!text) continue;
+
+      var ws = text.search(/\s/);
+      var op = (ws === -1 ? text : text.slice(0, ws)).toUpperCase();
+      var arg = (ws === -1 ? "" : text.slice(ws)).trim();
+
+      var enc = encodeInstruction(i, op, arg);
+      items.push({ line: i, addr: addr, bytes: enc.bytes, ref: enc.ref });
+      addr += enc.bytes.length;
+      if (addr > VRAM_START) throw asmError(i, "Program too large: code would run into VRAM at 0x8000");
+    }
+    if (items.length === 0) throw new Error("Nothing to assemble: the editor has no instructions.");
+
+    // ---- Pass 2: resolve labels ----
+    for (var j = 0; j < items.length; j++) {
+      var it = items[j];
+      if (it.ref !== null) {
+        if (!(it.ref in labels)) throw asmError(it.line, "Undefined label '" + it.ref + "'");
+        it.bytes[1] = (labels[it.ref] >> 8) & 0xFF;
+        it.bytes[2] = labels[it.ref] & 0xFF;
+      }
+    }
+  } catch (err) {
+    return failAssembly(err.message);
+  }
+
+  // ---- Success: load into a freshly wiped machine (screen is kept) ----
+  programImage = items.map(function (it) { return { addr: it.addr, bytes: it.bytes }; });
+  lineToAddr = {}; addrToLine = {};
+  items.forEach(function (it) { lineToAddr[it.line] = it.addr; addrToLine[it.addr] = it.line; });
+
+  resetMachine(true);
+  loadImage();
+  syncMemoryViewer();
+  programLoaded = true;
+  sourceDirty = false;
+
+  logConsole("Assembled successfully. " + addr + " bytes loaded.", "success");
+  setStatus("Ready", "", "READY");
+  updateUI();
+  return true;
+}
+
+/* ---------------- CPU ---------------- */
+function haltOk() {
+  stopRun();
+  halted = true;
+  setStatus("Success", OK_BG, "SUCCESS");
+  logConsole("Program finished successfully (HLT).", "success");
+}
+
+function fault(title, msg) {
+  stopRun();
+  halted = true;
+  setStatus(title, ERR_BG, "ERROR");
+  logConsole(msg, "err");
+}
+
+// Runs exactly one instruction. No DOM work here except on halt/fault, so it is cheap.
+function execute() {
+  instrCount++;
+  var pc = cpu.pc;
+  var op = mem[pc];
+  var n1 = (pc + 1) & 0xFFFF;
+  var n2 = (pc + 2) & 0xFFFF;
+  var n3 = (pc + 3) & 0xFFFF;
+  var val, target, eff, retAddr, lo, hi;
+
+  switch (op) {
+    case 0x00:
+      fault("FAULT: Empty Memory", "FAULT: Executed empty memory at $" + hex(pc, 4) + ". Did you forget to Assemble?");
+      return;
+    case 0x01: // LDA #val
+      cpu.a = mem[n1]; cpu.pc = n2; break;
+    case 0x02: // LDX #val
+      cpu.x = mem[n1]; cpu.pc = n2; break;
+    case 0x03: // STA addr,X
+      target = (mem[n1] << 8) | mem[n2];
+      eff = (target + cpu.x) & 0xFFFF;
+      mem[eff] = cpu.a;
+      markDirty(eff);
+      if (eff >= VRAM_START && eff <= VRAM_END) renderPixel(eff); // only VRAM touches the canvas
+      cpu.pc = n3;
+      break;
+    case 0x04: // ADD #val
+      cpu.a = (cpu.a + mem[n1]) & 0xFF;
+      cpu.zf = (cpu.a === 0) ? 1 : 0;
+      cpu.pc = n2; break;
+    case 0x05: // SUB #val
+      cpu.a = (cpu.a - mem[n1]) & 0xFF;
+      cpu.zf = (cpu.a === 0) ? 1 : 0;
+      cpu.pc = n2; break;
+    case 0x06: // INC X
+      cpu.x = (cpu.x + 1) & 0xFF;
+      cpu.zf = (cpu.x === 0) ? 1 : 0;
+      cpu.pc = n1; break;
+    case 0x07: // CMP #val
+      cpu.zf = (cpu.a === mem[n1]) ? 1 : 0;
+      cpu.pc = n2; break;
+    case 0x08: // JMP
+      cpu.pc = ((mem[n1] << 8) | mem[n2]) & 0xFFFF; break;
+    case 0x09: // JZ
+      cpu.pc = (cpu.zf === 1) ? (((mem[n1] << 8) | mem[n2]) & 0xFFFF) : n3;
+      break;
+    case 0x0A: // PUSH A
+      mem[cpu.sp] = cpu.a; markDirty(cpu.sp);
+      cpu.sp = (cpu.sp - 1) & 0xFFFF;
+      cpu.pc = n1; break;
+    case 0x0B: // POP A
+      cpu.sp = (cpu.sp + 1) & 0xFFFF;
+      cpu.a = mem[cpu.sp];
+      cpu.pc = n1; break;
+    case 0x0C: // CALL
+      retAddr = n3;
+      mem[cpu.sp] = (retAddr >> 8) & 0xFF; markDirty(cpu.sp);
+      cpu.sp = (cpu.sp - 1) & 0xFFFF;
+      mem[cpu.sp] = retAddr & 0xFF; markDirty(cpu.sp);
+      cpu.sp = (cpu.sp - 1) & 0xFFFF;
+      cpu.pc = ((mem[n1] << 8) | mem[n2]) & 0xFFFF;
+      break;
+    case 0x0D: // RET
+      lo = mem[(cpu.sp + 1) & 0xFFFF];
+      hi = mem[(cpu.sp + 2) & 0xFFFF];
+      cpu.sp = (cpu.sp + 2) & 0xFFFF;
+      cpu.pc = ((hi << 8) | lo) & 0xFFFF;
+      break;
+    case 0x0E: // HLT (PC stays on the HLT)
+      haltOk();
+      return;
+    case 0x0F: // TAX
+      cpu.x = cpu.a; cpu.zf = (cpu.x === 0) ? 1 : 0; cpu.pc = n1; break;
+    case 0x10: // TXA
+      cpu.a = cpu.x; cpu.zf = (cpu.a === 0) ? 1 : 0; cpu.pc = n1; break;
+    case 0x11: // INC Y
+      cpu.y = (cpu.y + 1) & 0xFF; cpu.zf = (cpu.y === 0) ? 1 : 0; cpu.pc = n1; break;
+    case 0x12: // TAY
+      cpu.y = cpu.a; cpu.zf = (cpu.y === 0) ? 1 : 0; cpu.pc = n1; break;
+    case 0x13: // TYA
+      cpu.a = cpu.y; cpu.zf = (cpu.a === 0) ? 1 : 0; cpu.pc = n1; break;
+    default:
+      fault("Error: Invalid Opcode", "FAULT: Invalid Opcode $" + hex(op, 2) + " at $" + hex(pc, 4));
+      return;
+  }
+}
+
+function restartProgram() {
+  stopRun();
+  resetCpuState();
+  loadImage();           // put the original code back in case the program rewrote itself
+  setStatus("Ready", "", "READY");
+  logConsole("Restarting from PC $0000.", "info");
+  flushDirty();
+  updateUI();
+}
+
+// Make sure there is a valid, current program before anything is allowed to execute.
+function ensureProgram() {
+  if (sourceDirty || !programLoaded) {
+    if (sourceDirty) logConsole("Source changed since last assemble. Re-assembling...", "info");
+    if (!assemble()) return false;
+  }
+  return true;
+}
+
+function stepOnce() {
+  stopRun();
+  if (!ensureProgram()) return;
+  if (halted) restartProgram();
+  execute();
+  flushDirty();
+  updateUI();
+}
+
+function startRun() {
+  if (!ensureProgram()) return;
+  if (halted) restartProgram();
+  running = true;
+  lastFrame = 0;
+  statsT = 0; statsCount = instrCount;
+  carry = 1;                 // execute the first instruction on the very first frame
+  skipBreakpointOnce = true; // resuming from a breakpoint must not re-trigger it
+  $("btn-run").innerText = "Pause";
+  setStatus("Running...", "", "RUNNING");
+  logConsole("Execution started at PC $" + hex(cpu.pc, 4) + " (" + clockHz + " Hz)", "info");
+  rafId = requestAnimationFrame(runLoop);
+}
+
+function pauseRun() {
+  stopRun();
+  setStatus("Execution Paused", "", "READY");
+  logConsole("Execution suspended.", "info");
+  flushDirty();
+  updateUI();
+}
+
+function runLoop(timestamp) {
+  if (!running) return;
+  if (!lastFrame) lastFrame = timestamp;
+  var dt = Math.min(timestamp - lastFrame, 100);
+  lastFrame = timestamp;
+
+  carry += clockHz * dt / 1000;
+  var n = Math.floor(carry);
+  carry -= n;
+  if (n > MAX_STEPS_PER_FRAME) n = MAX_STEPS_PER_FRAME;
+
+  for (var i = 0; i < n && running; i++) {
+    var ln = addrToLine[cpu.pc];
+    if (!skipBreakpointOnce && ln !== undefined && breakpoints.has(ln)) {
+      stopRun();
+      setStatus("Breakpoint Encountered", "", "READY");
+      logConsole("Breakpoint hit at line " + (ln + 1) + " (PC: $" + hex(cpu.pc, 4) + ")", "info");
+      break;
+    }
+    skipBreakpointOnce = false;
+    execute();
+  }
+
+  // measured speed: instructions actually executed per real second
+  if (!statsT) { statsT = timestamp; statsCount = instrCount; }
+  else if (timestamp - statsT >= 250) {
+    actualHz = Math.round((instrCount - statsCount) * 1000 / (timestamp - statsT));
+    statsT = timestamp; statsCount = instrCount;
+  }
+  flushDirty();
+  updateUI();
+  if (running) rafId = requestAnimationFrame(runLoop);
+}
+
+function stopRun() {
+  running = false;
+  if (rafId) cancelAnimationFrame(rafId);
+  rafId = null;
+  $("btn-run").innerText = "Run";
+  actualHz = 0;
+}
+
+function fullReset() {
+  resetMachine(false);   // wipes RAM and the screen
+  programLoaded = false;
+  programImage = [];
+  lineToAddr = {}; addrToLine = {};
+  clearError();
+  setStatus("Ready", "", "READY");
+  syncMemoryViewer();
+  updateUI();
+  logConsole("CPU and Memory reset. Press Assemble to load the program again.", "info");
+}
+
+/* ---------------- Disassembler / UI refresh ---------------- */
+function disasm(p) {
+  var b = mem[p];
+  var w1 = mem[(p + 1) & 0xFFFF];
+  var w16 = (mem[(p + 1) & 0xFFFF] << 8) | mem[(p + 2) & 0xFFFF];
+  switch (b) {
+    case 0x00: return { text: "NOP", len: 1 };
+    case 0x01: return { text: "LDA #" + hex(w1, 2), len: 2 };
+    case 0x02: return { text: "LDX #" + hex(w1, 2), len: 2 };
+    case 0x03: return { text: "STA $" + hex(w16, 4) + ",X", len: 3 };
+    case 0x04: return { text: "ADD #" + hex(w1, 2), len: 2 };
+    case 0x05: return { text: "SUB #" + hex(w1, 2), len: 2 };
+    case 0x06: return { text: "INC X", len: 1 };
+    case 0x07: return { text: "CMP #" + hex(w1, 2), len: 2 };
+    case 0x08: return { text: "JMP $" + hex(w16, 4), len: 3 };
+    case 0x09: return { text: "JZ $" + hex(w16, 4), len: 3 };
+    case 0x0A: return { text: "PUSH A", len: 1 };
+    case 0x0B: return { text: "POP A", len: 1 };
+    case 0x0C: return { text: "CALL $" + hex(w16, 4), len: 3 };
+    case 0x0D: return { text: "RET", len: 1 };
+    case 0x0E: return { text: "HLT", len: 1 };
+    case 0x0F: return { text: "TAX", len: 1 };
+    case 0x10: return { text: "TXA", len: 1 };
+    case 0x11: return { text: "INC Y", len: 1 };
+    case 0x12: return { text: "TAY", len: 1 };
+    case 0x13: return { text: "TYA", len: 1 };
+    default:   return { text: "???", len: 1 };
+  }
+}
+
+function updateUI() {
+  $("reg-a").innerText = hex(cpu.a, 2);
+  $("reg-x").innerText = hex(cpu.x, 2);
+  $("reg-y").innerText = hex(cpu.y, 2);
+  $("reg-pc").innerText = hex(cpu.pc, 4);
+  $("reg-sp").innerText = hex(cpu.sp, 4);
+  $("reg-zf").innerText = cpu.zf;
+  $("clock-stats").innerHTML = "<span>Executed: " + instrCount.toLocaleString("en-US") + "</span><span>Actual: " + actualHz.toLocaleString("en-US") + " Hz</span>";
+
+  var curLine = addrToLine[cpu.pc];
+  if (curLine !== undefined) {
+    lineMarker.style.display = "block";
+    lineMarker.style.top = (curLine * 18 + 4) + "px";
+  } else {
+    lineMarker.style.display = "none";
+  }
+
+  var disBox = $("disasm-items");
+  disBox.innerHTML = "";
+  var ptr = cpu.pc;
+  for (var k = 0; k < 3; k++) {
+    var d = disasm(ptr);
+    var bytes = [];
+    for (var bi = 0; bi < d.len; bi++) bytes.push(hex(mem[(ptr + bi) & 0xFFFF], 2));
+    var row = document.createElement("div");
+    row.className = "disasm-row" + (k === 0 ? " active" : "");
+    row.innerHTML = "<span>$" + hex(ptr, 4) + " " + d.text + "</span><span>" + bytes.join("") + "</span>";
+    disBox.appendChild(row);
+    ptr = (ptr + d.len) & 0xFFFF;
+  }
+}
+
+function updateLineNumbers() {
+  var count = codeInput.value.split("\n").length;
+  $("line-counter").innerText = count + " lines";
+  var html = "";
+  for (var i = 0; i < count; i++) {
+    html += "<div class='gutter-row' onclick='toggleBp(" + i + ")'>";
+    html += "<span class='gutter-bp" + (breakpoints.has(i) ? " active" : "") + "'></span>";
+    html += (i + 1) + "</div>";
+  }
+  lineNums.innerHTML = html;
+}
+
+window.toggleBp = function (ln) {
+  if (breakpoints.has(ln)) { breakpoints.delete(ln); logConsole("Breakpoint removed at line " + (ln + 1), "info"); }
+  else { breakpoints.add(ln); logConsole("Breakpoint set at line " + (ln + 1), "info"); }
+  updateLineNumbers();
+};
+
+/* ---------------- Toolbar / controls ---------------- */
+$("btn-assemble").onclick = function () { assemble(); };
+$("btn-step").onclick = function () { stepOnce(); };
+$("btn-run").onclick = function () { if (running) pauseRun(); else startRun(); };
+$("btn-reset").onclick = function () { fullReset(); };
+
+// Typed clock speed: whole Hz, 1..1,000,000. Takes effect immediately, even mid-run.
+function setClock(raw) {
+  var s = String(raw).replace(/[,_\s]/g, "");
+  var v = /^[0-9]+$/.test(s) ? parseInt(s, 10) : NaN;
+  if (isNaN(v) || v < 1 || v > MAX_HZ) {
+    clockInput.value = clockHz;
+    logConsole("Clock must be a whole number from 1 to 1,000,000 Hz.", "err");
+    return false;
+  }
+  clockHz = v;
+  clockInput.value = v;
+  speedVal.innerText = v.toLocaleString("en-US");
+  return true;
+}
+clockInput.addEventListener("change", function () { setClock(this.value); });
+clockInput.addEventListener("keydown", function (e) { if (e.key === "Enter") { setClock(this.value); this.blur(); } });
+clockPreset.addEventListener("change", function () { if (this.value) setClock(this.value); this.value = ""; });
+
+$("mem-table").addEventListener("click", function (e) {
+  var t = e.target;
+  if (t && t.classList && t.classList.contains("mem-byte")) inspectMem(parseInt(t.id.slice(6), 10));
+});
+
+function typingInEditor(e) {
+  var tag = e.target && e.target.tagName;
+  return tag === "TEXTAREA" || tag === "INPUT";
+}
+window.addEventListener("keydown", function (e) {
+  if (typingInEditor(e)) return;
+  var keyVal = 0;
+  if (e.key === "ArrowUp" || e.key === "w" || e.key === "W") keyVal = 1;
+  else if (e.key === "ArrowDown" || e.key === "s" || e.key === "S") keyVal = 2;
+  else if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") keyVal = 3;
+  else if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") keyVal = 4;
+  if (keyVal !== 0 && mem[KEY_PORT] !== keyVal) {
+    mem[KEY_PORT] = keyVal;
+    mmioVal.innerText = hex(keyVal, 2);
+    markDirty(KEY_PORT); flushDirty();
+  }
+});
+window.addEventListener("keyup", function () {
+  if (mem[KEY_PORT] !== 0) {
+    mem[KEY_PORT] = 0;
+    mmioVal.innerText = "00";
+    markDirty(KEY_PORT); flushDirty();
+  }
+});
+
+codeInput.addEventListener("input", function () { sourceDirty = true; updateLineNumbers(); });
+codeInput.addEventListener("scroll", function () {
+  lineNums.scrollTop = codeInput.scrollTop;
+  lineMarker.style.transform = "translateY(" + (-codeInput.scrollTop) + "px)";
+});
+
+/* ---------------- Menus ---------------- */
+function closeAllDropdowns() {
+  document.querySelectorAll(".win-dropdown").forEach(function (d) { d.style.display = "none"; });
+  document.querySelectorAll(".win-menu-item").forEach(function (m) { m.classList.remove("open"); });
+}
+function wireMenu(menuId, dropId) {
+  $(menuId).onclick = function (e) {
+    e.stopPropagation();
+    var dd = $(dropId);
+    var open = dd.style.display === "flex";
+    closeAllDropdowns();
+    if (!open) { dd.style.display = "flex"; this.classList.add("open"); }
+  };
+}
+wireMenu("menu-file", "dropdown-file");
+wireMenu("menu-view", "dropdown-view");
+wireMenu("menu-help", "dropdown-help");
+
+Object.keys(DEMOS).forEach(function (id) {
+  $(id).onclick = function (e) {
+    e.stopPropagation();
+    codeInput.value = DEMOS[id].code;
+    updateLineNumbers();
+    assemble();
+    logConsole("Loaded: " + DEMOS[id].name + " Demo", "info");
+    closeAllDropdowns();
+  };
+});
+
+$("action-save-file").onclick = function (e) {
+  e.stopPropagation();
+  var blob = new Blob([codeInput.value], { type: "text/plain;charset=utf-8" });
+  var aTag = document.createElement("a");
+  aTag.href = URL.createObjectURL(blob);
+  aTag.download = "program.asm";
+  aTag.click();
+  URL.revokeObjectURL(aTag.href);
+  logConsole("Program downloaded as program.asm", "info");
+  closeAllDropdowns();
+};
+$("action-load-file").onclick = function (e) { e.stopPropagation(); filePicker.click(); closeAllDropdowns(); };
+filePicker.addEventListener("change", function (e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function (evt) {
+    codeInput.value = evt.target.result;
+    updateLineNumbers();
+    assemble();
+    logConsole("Loaded assembly file: " + file.name, "info");
+  };
+  reader.readAsText(file);
+  filePicker.value = "";
+});
+
+$("action-toggle-grid").onclick = function (e) {
+  e.stopPropagation();
+  showGrid = !showGrid;
+  this.innerText = showGrid ? "Grid Toggle [ON]" : "Grid Toggle [OFF]";
+  redrawAllVRAM();
+  logConsole("Canvas grid " + (showGrid ? "enabled." : "disabled."), "info");
+  closeAllDropdowns();
+};
+$("action-clear").onclick = function (e) {
+  e.stopPropagation();
+  codeInput.value = "";
+  sourceDirty = true;
+  updateLineNumbers();
+  logConsole("Editor cleared.", "info");
+  closeAllDropdowns();
+};
+
+/* ---------------- Dialogs (About / ISA) ---------------- */
+$("action-about").onclick = function (e) { e.stopPropagation(); $("modal-about").style.display = "flex"; closeAllDropdowns(); };
+$("modal-about-close").onclick = function () { $("modal-about").style.display = "none"; };
+$("modal-about-ok").onclick = function () { $("modal-about").style.display = "none"; };
+$("action-isa").onclick = function (e) { e.stopPropagation(); $("modal-isa").style.display = "flex"; closeAllDropdowns(); };
+$("modal-isa-close").onclick = function () { $("modal-isa").style.display = "none"; };
+$("modal-isa-ok").onclick = function () { $("modal-isa").style.display = "none"; };
+
+/* ---------------- Desktop: icons, folder window, guide.md ---------------- */
+var zTop = 300;
+function bringToFront(win) { win.style.zIndex = ++zTop; }
+
+function openWindow(id) {
+  var win = $(id);
+  win.style.display = "flex";
+  var maxLeft = Math.max(4, window.innerWidth - win.offsetWidth - 4);
+  var maxTop = Math.max(4, window.innerHeight - win.offsetHeight - 4);
+  win.style.left = Math.min(parseInt(win.style.left, 10) || 4, maxLeft) + "px";
+  win.style.top = Math.min(parseInt(win.style.top, 10) || 4, maxTop) + "px";
+  bringToFront(win);
+}
+function closeWindow(id) { $(id).style.display = "none"; }
+
+function makeDraggable(win) {
+  var handle = win.querySelector(".float-handle");
+  win.addEventListener("pointerdown", function () { bringToFront(win); });
+  handle.addEventListener("pointerdown", function (e) {
+    if (e.target.closest(".win-titlebar-btn")) return;
+    var r = win.getBoundingClientRect();
+    var dx = e.clientX - r.left, dy = e.clientY - r.top;
+    try { handle.setPointerCapture(e.pointerId); } catch (err) {}
+    function move(ev) {
+      win.style.left = Math.max(0, Math.min(window.innerWidth - 80, ev.clientX - dx)) + "px";
+      win.style.top = Math.max(0, Math.min(window.innerHeight - 30, ev.clientY - dy)) + "px";
+    }
+    function up() {
+      handle.removeEventListener("pointermove", move);
+      handle.removeEventListener("pointerup", up);
+    }
+    handle.addEventListener("pointermove", move);
+    handle.addEventListener("pointerup", up);
+  });
+}
+makeDraggable($("win-folder"));
+makeDraggable($("win-guide"));
+document.querySelectorAll("[data-close]").forEach(function (btn) {
+  btn.addEventListener("click", function () { closeWindow(btn.getAttribute("data-close")); });
+});
+
+function deselectAll() {
+  document.querySelectorAll(".desktop-icon.selected, .file-item.selected").forEach(function (el) { el.classList.remove("selected"); });
+}
+// Single click selects, a second click within 450ms (or Enter) opens - like the real thing.
+function onOpen(el, handler) {
+  var last = 0;
+  el.addEventListener("click", function (e) {
+    e.stopPropagation();
+    closeAllDropdowns();
+    deselectAll();
+    el.classList.add("selected");
+    var now = Date.now();
+    if (now - last < 450) { last = 0; handler(); } else { last = now; }
+  });
+  el.addEventListener("keydown", function (e) { if (e.key === "Enter") handler(); });
+}
+function openFolder() { openWindow("win-folder"); logConsole("Opened folder: C:\\koiafk\\Documentation", "info"); }
+function openGuide() { openWindow("win-guide"); logConsole("Opened guide.md", "info"); }
+onOpen($("icon-docs"), openFolder);
+onOpen($("file-guide"), openGuide);
+$("action-manual").onclick = function (e) { e.stopPropagation(); closeAllDropdowns(); openGuide(); };
+document.addEventListener("click", deselectAll);
+window.addEventListener("click", closeAllDropdowns);
+
+/* ---------------- Funny window-button popups ---------------- */
+var POPUP_ICONS = {
+  error: "<svg viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='#e01010' stroke='#600000' stroke-width='1.5'/><path d='M10 10 L22 22 M22 10 L10 22' stroke='#fff' stroke-width='3.5' stroke-linecap='round'/></svg>",
+  warn: "<svg viewBox='0 0 32 32'><path d='M16 3 L30 28 H2 Z' fill='#ffd800' stroke='#5a4a00' stroke-width='1.5' stroke-linejoin='round'/><path d='M16 11 V20' stroke='#000' stroke-width='3' stroke-linecap='round'/><circle cx='16' cy='24' r='1.8' fill='#000'/></svg>",
+  info: "<svg viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='#2a6fe0' stroke='#0a2a70' stroke-width='1.5'/><circle cx='16' cy='9.5' r='2' fill='#fff'/><path d='M16 14 V24' stroke='#fff' stroke-width='3.5' stroke-linecap='round'/></svg>"
+};
+var POPUPS = {
+  close: { icon: "error", title: "Shutdown Error", lines: [
+    "koiafk OS cannot be closed.\n\nThe close button is purely decorative, like a fire exit painted on a wall.",
+    "Fatal Exception 0E has occurred at 0028:C0011E36.\n\n...just kidding. You still can't leave, though.",
+    "Closing this window would leave the desktop icons homeless.\n\nHave a heart.",
+    "Error 418: I'm a teapot.\n\nTeapots do not shut down.",
+    "Your CPU registers begged me not to let you go.\n\nThey have been through a lot of INC X.",
+    "Attempting to close... 0%... 0%... 0%...\n\nTask failed successfully."
+  ] },
+  minimize: { icon: "info", title: "Minimize", lines: [
+    "Cannot minimize: the taskbar was never built.\n\nWhere would the window even go?",
+    "This window tried to minimize itself and got stage fright.",
+    "Minimize is not supported.\n\nThere is no taskbar. Only vibes."
+  ] },
+  maximize: { icon: "warn", title: "Fullscreen", lines: [
+    "This window is already living its best life.\n\nIt refuses to grow any further.",
+    "Fullscreen denied.\n\nThe window has seen what is out there and wants to stay cozy.",
+    "Maximize.exe has stopped responding because the window is already maximal.\n\nA true Aero legend."
+  ] }
+};
+var popupCounters = { close: 0, minimize: 0, maximize: 0 };
+
+function showPopup(kind) {
+  var p = POPUPS[kind];
+  var msg = p.lines[popupCounters[kind] % p.lines.length];
+  popupCounters[kind]++;
+  $("popup-title").textContent = p.title;
+  $("popup-icon").innerHTML = POPUP_ICONS[p.icon];
+  $("popup-msg").textContent = msg;
+  $("popup-overlay").style.display = "flex";
+  $("popup-ok").focus();
+}
+function hidePopup() { $("popup-overlay").style.display = "none"; }
+
+$("btn-win-min").onclick = function () { showPopup("minimize"); };
+$("btn-win-max").onclick = function () { showPopup("maximize"); };
+$("btn-win-close").onclick = function () { showPopup("close"); logConsole("Session shutdown aborted.", "info"); };
+$("popup-ok").onclick = hidePopup;
+$("popup-x").onclick = hidePopup;
+window.addEventListener("keydown", function (e) {
+  if (e.key === "Escape" && $("popup-overlay").style.display === "flex") hidePopup();
+});
+
+/* ---------------- Boot ---------------- */
+buildMemoryViewer();
+setClock(clockHz);
+codeInput.value = demoFill;
+updateLineNumbers();
+assemble();
+</script>
+</body>
+</html>
